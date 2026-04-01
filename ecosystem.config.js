@@ -1,19 +1,19 @@
 module.exports = {
   apps: [
     {
-      name: "app-proativo-frontend",
+      name: "VITE-APP",
       script: "serve",
       env: {
-        PM2_SERVE_PATH: './dist',
+        PM2_SERVE_PATH: "./dist",
         PM2_SERVE_PORT: 3000,
-        PM2_SERVE_SPA: 'true',
-        PM2_SERVE_HOMEPAGE: '/index.html'
+        PM2_SERVE_SPA: "true"
       }
     },
     {
-      name: "app-proativo-backend",
-      script: "backend/services/processarmensagem.py",
-      interpreter: "./venv/bin/python",
+      name: "PYTHON-APP",
+      script: "./venv/bin/python",
+      args: "backend/services/processarmensagem.py",
+      interpreter: "none",
       env: {
         PORT: 6969
       }
