@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Templates</title>
+  <link rel="stylesheet" href="./style/template.css" />
+</head>
+<body>
+  <div class="layout">
+    <header class="top-menu">
+      <img src="./LOGO_ANY_ANT_HORIZONTAL_1.svg" alt="Logo" class="logo" />
+
+      <nav class="menu">
+        <button type="button" data-target="acoes">Ações</button>
+        <button type="button" data-target="contatos">Base de contatos</button>
+        <button type="button" data-target="templates" class="active">Templates</button>
+        <button type="button" data-target="relatorios">Relatórios</button>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="card">
+        <div class="section-head">
+          <h2>Cadastrar template</h2>
+          <p>Preencha os campos abaixo para salvar um novo template no Supabase.</p>
+        </div>
+
+        <form id="templateForm" class="form-grid">
+          <input type="hidden" id="templateId" />
+
+          <div class="field">
+            <label for="nome">Nome do template</label>
+            <input type="text" id="nome" name="nome" placeholder="Ex: Retorno atraso Amazon" required />
+          </div>
+
+          <div class="field">
+            <label for="time">Time</label>
+            <select id="time" name="time">
+              <option value="Ativo">Ativo</option>
+            </select>
+          </div>
+
+          <div class="field field-full">
+            <label for="motivo">Motivo</label>
+            <select id="motivo" name="motivo">
+              <option value="">Selecione um motivo</option>
+              <option value="SKU não vinculado">SKU não vinculado</option>
+              <option value="Atributos obrigatórios não informados">Atributos obrigatórios não informados</option>
+              <option value="MultiWarehouse">MultiWarehouse</option>
+              <option value="Webnar">Webnar</option>
+            </select>
+          </div>
+
+          <div class="field field-full">
+            <label for="titulo_ticket">Título do ticket</label>
+            <input type="text" id="titulo_ticket" name="titulo_ticket" placeholder="Digite o título do ticket" />
+          </div>
+
+          <div class="field field-full">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" placeholder="Digite a descrição do ticket"></textarea>
+          </div>
+
+          <div class="field field-full">
+            <label for="mensagem">Mensagem</label>
+            <textarea id="mensagem" name="mensagem" placeholder="Digite a mensagem do template" class="textarea-lg" required></textarea>
+          </div>
+
+          <div class="actions-row">
+            <button type="submit" id="btnSalvarTemplate">Salvar template</button>
+            <button type="button" id="btnLimparCampos">Limpar campos</button>
+          </div>
+        </form>
+
+        <div class="feedback-grid">
+          <div id="retornoMensagem">Nenhuma ação executada ainda.</div>
+        </div>
+      </section>
+
+      <section class="card templates-list-card">
+        <div class="section-head">
+          <h2>Templates cadastrados</h2>
+          <p>Visualize, edite e exclua os templates cadastrados.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Motivo</th>
+                <th>Título Ticket</th>
+                <th>Descrição</th>
+                <th>Mensagem</th>
+                <th>Time</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="templatesTableBody">
+              <tr>
+                <td colspan="7" class="empty-row">Carregando templates...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="./javascript/template.js"></script>
+</body>
+</html>

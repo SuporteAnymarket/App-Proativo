@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Base de contatos</title>
+  <link rel="stylesheet" href="./style/contato.css" />
+</head>
+<body>
+  <div class="layout">
+    <header class="top-menu">
+      <img src="./LOGO_ANY_ANT_HORIZONTAL_1.svg" alt="Logo" class="logo" />
+
+      <nav class="menu">
+        <button type="button" data-target="acoes">Ações</button>
+        <button type="button" data-target="contatos" class="active">Base de contatos</button>
+        <button type="button" data-target="templates">Templates</button>
+        <button type="button" data-target="relatorios">Relatórios</button>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="card card-cadastro">
+        <div class="section-head">
+          <div>
+            <h2>Cadastro de empresa e contatos</h2>
+            <p>Cadastre a empresa e já vincule um ou vários contatos no mesmo formulário.</p>
+          </div>
+        </div>
+
+        <form id="empresaForm" class="empresa-form">
+          <input type="hidden" id="empresaId" />
+
+          <div class="form-block">
+            <div class="section-head section-head-secondary">
+              <div>
+                <h3>Dados da empresa</h3>
+                <p>Preencha os dados principais da empresa para iniciar o cadastro.</p>
+              </div>
+            </div>
+
+            <div class="form-grid empresa-grid">
+              <div class="field">
+                <label for="empresaNome">Nome da empresa</label>
+                <input type="text" id="empresaNome" placeholder="Ex: Loja Exemplo" required />
+              </div>
+
+              <div class="field">
+                <label for="empresaOi">OI</label>
+                <input type="text" id="empresaOi" placeholder="Ex: 259000000." required />
+              </div>
+
+              <div class="field field-checkbox">
+                <label for="empresaAtiva">Status da empresa</label>
+                <label class="checkbox-inline">
+                  <input type="checkbox" id="empresaAtiva" checked />
+                  <span>Empresa ativa</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-block">
+            <div class="section-head section-head-secondary section-head-inline">
+              <div>
+                <h3>Contatos iniciais</h3>
+                <p>Adicione quantas linhas precisar para cadastrar vários contatos de uma vez.</p>
+              </div>
+
+              <div class="actions-row top-actions">
+                <button type="button" id="btnAdicionarContato" class="btn-secondary">Adicionar contato</button>
+                <button type="button" id="btnLimparContatosGrid" class="btn-light">Limpar contatos</button>
+              </div>
+            </div>
+
+            <div class="contatos-stack" id="contatosGridBody">
+              <div class="contato-card contato-row">
+                <input type="hidden" data-field="contatoId" />
+
+                <div class="field">
+                  <label>Nome</label>
+                  <input type="text" data-field="nome" placeholder="Nome do contato" />
+                </div>
+
+                <div class="field">
+                  <label>E-mail</label>
+                  <input type="email" data-field="email" placeholder="email@empresa.com" />
+                </div>
+
+                <div class="field">
+                  <label>Telefone</label>
+                  <input type="text" data-field="telefone" placeholder="(44) 99999-9999" />
+                </div>
+
+                <div class="field">
+                  <label>Cargo</label>
+                  <input type="text" data-field="cargo" placeholder="Ex: Comprador" />
+                </div>
+
+                <div class="field">
+                  <label>Principal</label>
+                  <select data-field="principal">
+                    <option value="false">Não</option>
+                    <option value="true">Sim</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Ativo</label>
+                  <select data-field="ativo">
+                    <option value="true">Ativo</option>
+                    <option value="false">Inativo</option>
+                  </select>
+                </div>
+
+                <div class="field field-action">
+                  <label>Ação</label>
+                  <button type="button" class="btn-remove-row">Remover</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions-row form-actions">
+            <button type="button" id="btnNovaEmpresa" class="btn-light">Nova empresa</button>
+            <button type="submit" id="btnSalvarEmpresa" class="btn-primary">Salvar empresa e contatos</button>
+          </div>
+        </form>
+
+        <div class="feedback-grid">
+          <div id="retornoEmpresa">Nenhuma ação executada ainda.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <h2>Importação em massa via CSV</h2>
+            <p>Importe empresas e contatos em lote. Cada linha do CSV representa um contato vinculado a uma empresa.</p>
+          </div>
+        </div>
+
+        <div class="csv-help">
+          <p>Colunas esperadas:</p>
+          <code>empresa_nome,oi,empresa_ativa,contato_nome,contato_email,contato_telefone,contato_cargo,contato_principal,contato_ativo</code>
+        </div>
+
+        <div class="actions-row csv-actions">
+          <input type="file" id="csvInput" accept=".csv" />
+          <button type="button" id="btnImportarCsv" class="btn-primary">Importar CSV</button>
+        </div>
+
+        <div class="feedback-grid">
+          <div id="retornoCsv">Nenhum arquivo importado.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <h2>Buscar empresas cadastradas</h2>
+            <p>Pesquise por nome da empresa ou OI para localizar um cadastro específico.</p>
+          </div>
+        </div>
+
+        <div class="busca-empresas-box">
+          <div class="busca-empresas-grid">
+            <div class="field">
+              <label for="filtroTipoBusca">Buscar por</label>
+              <select id="filtroTipoBusca">
+                <option value="name">Empresa</option>
+                <option value="oi">OI</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="inputBuscaEmpresa">Pesquisar</label>
+              <input
+                type="text"
+                id="inputBuscaEmpresa"
+                placeholder="Digite o nome da empresa ou o OI"
+              />
+            </div>
+
+            <div class="actions-row busca-empresas-actions">
+              <button type="button" id="btnBuscarEmpresa" class="btn-primary">Buscar</button>
+              <button type="button" id="btnLimparBuscaEmpresa" class="btn-light">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback-grid">
+          <div id="retornoBuscaEmpresa">Faça uma busca para visualizar empresas cadastradas.</div>
+        </div>
+
+        <div class="table-wrap hidden" id="resultadoBuscaWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>OI</th>
+                <th>Status</th>
+                <th>Qtd. contatos</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="empresasTableBody">
+              <tr>
+                <td colspan="5" class="empty-row">Faça uma busca para visualizar os resultados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modalContatoBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h3>Gerenciar contatos</h3>
+          <p id="modalEmpresaTitulo">Empresa não selecionada</p>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnFecharModal">Fechar</button>
+      </div>
+
+      <div class="section-head section-head-secondary section-head-inline modal-section-head">
+        <div>
+          <h4>Contatos da empresa</h4>
+          <p>Adicione, edite ou remova contatos da empresa selecionada.</p>
+        </div>
+
+        <div class="actions-row modal-actions">
+          <button type="button" id="btnModalAdicionarContato" class="btn-secondary">Adicionar contato</button>
+          <button type="button" id="btnModalLimparContatos" class="btn-light">Limpar linhas</button>
+          <button type="button" id="btnModalSalvarContatos" class="btn-primary">Salvar contatos</button>
+        </div>
+      </div>
+
+      <div class="contatos-stack modal-contatos-stack" id="modalContatosGridBody">
+        <div class="contato-card contato-card-modal modal-contato-row">
+          <input type="hidden" data-field="contatoId" />
+
+          <div class="field">
+            <label>Nome</label>
+            <input type="text" data-field="nome" placeholder="Nome do contato" />
+          </div>
+
+          <div class="field">
+            <label>E-mail</label>
+            <input type="email" data-field="email" placeholder="email@empresa.com" />
+          </div>
+
+          <div class="field">
+            <label>Telefone</label>
+            <input type="text" data-field="telefone" placeholder="(44) 99999-9999" />
+          </div>
+
+          <div class="field">
+            <label>Cargo</label>
+            <input type="text" data-field="cargo" placeholder="Ex: Comprador" />
+          </div>
+
+          <div class="field">
+            <label>Principal</label>
+            <select data-field="principal">
+              <option value="false">Não</option>
+              <option value="true">Sim</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Ativo</label>
+            <select data-field="ativo">
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+
+          <div class="field field-action">
+            <label>Ação</label>
+            <button type="button" class="btn-remove-row">Remover</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback-grid">
+        <div id="retornoModalContato">Nenhuma ação executada no modal.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="./javascript/contato.js"></script>
+</body>
+</html>

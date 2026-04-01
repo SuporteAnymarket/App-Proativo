@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style/style.css" />
+  <title>ANY-Message Login</title>
+</head>
+<body>
+  <main>
+    <form id="loginForm">
+      <img src="./LOGO_ANY_ANT_HORIZONTAL_1.svg" alt="Logo ANYMARKET" />
+      <h1>Fazer login</h1>
+
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" placeholder="seuemail@empresa.com" required />
+
+      <label for="password">Senha</label>
+      <input type="password" id="password" name="password" placeholder="Digite sua senha" required />
+
+      <div class="actions">
+        <button type="submit" id="loginButton">Acessar</button>
+        <button type="reset" id="clearButton">Limpar campos</button>
+      </div>
+
+      <div id="message"></div>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="./auth-java/auth-java.js"></script>
+</body>
+</html>

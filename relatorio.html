@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANY-Message | Relatórios</title>
+  <link rel="stylesheet" href="./style/relatorio.css" />
+</head>
+
+<body>
+  <div class="layout">
+
+    <header class="top-menu">
+      <img class="logo" src="./LOGO_ANY_ANT_HORIZONTAL_1.svg" alt="Logo ANYMARKET" />
+
+      <nav class="menu">
+        <button data-target="acoes" type="button">Ações</button>
+        <button data-target="contatos" type="button">Base de contatos</button>
+        <button data-target="templates" type="button">Templates</button>
+        <button class="active" data-target="relatorios" type="button">Relatórios</button>
+      </nav>
+    </header>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <h1>Relatórios</h1>
+        </div>
+      </header>
+
+      <section id="relatorios" class="page-section active">
+        <div class="card action-area">
+
+          <div class="section-head">
+            <h2>Relatório de envios</h2>
+            <p>Consulte o status dos envios, protocolos e retornos dos clientes.</p>
+          </div>
+
+          <div class="filters-grid">
+            <div class="filter-item">
+              <label for="filtroOi">OI</label>
+              <input type="text" id="filtroOi" placeholder="Digite a OI" />
+            </div>
+
+            <div class="filter-item">
+              <label for="filtroEmpresa">Empresa</label>
+              <input type="text" id="filtroEmpresa" placeholder="Digite a empresa" />
+            </div>
+
+            <div class="filter-item">
+              <label for="filtroTemplate">Template</label>
+              <select id="filtroTemplate">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+            <div class="filter-item">
+              <label for="filtroStatus">Status do follow-up</label>
+              <select id="filtroStatus">
+                <option value="">Todos</option>
+                <option value="AGUARDANDO">Aguardando</option>
+                <option value="RESPONDIDO">Respondido</option>
+                <option value="SEM_RETORNO">Sem retorno</option>
+              </select>
+            </div>
+
+            <div class="filter-item">
+              <label for="filtroDataInicio">Data inicial</label>
+              <input type="date" id="filtroDataInicio" />
+            </div>
+
+            <div class="filter-item">
+              <label for="filtroDataFim">Data final</label>
+              <input type="date" id="filtroDataFim" />
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button id="btnBuscarRelatorio">Buscar</button>
+            <button id="btnAtualizarFollowup">Atualizar retornos</button>
+            <button id="btnLimparFiltros">Limpar filtros</button>
+            <button id="btnExportarRelatorio">Exportar CSV</button>
+          </div>
+
+          <div class="summary-grid">
+            <div class="summary-card">
+              <span class="summary-label">Total de registros</span>
+              <strong id="totalRegistros">0</strong>
+            </div>
+
+            <div class="summary-card">
+              <span class="summary-label">Aguardando</span>
+              <strong id="totalAguardando">0</strong>
+            </div>
+
+            <div class="summary-card">
+              <span class="summary-label">Respondidos</span>
+              <strong id="totalRespondidos">0</strong>
+            </div>
+
+            <div class="summary-card">
+              <span class="summary-label">Sem retorno</span>
+              <strong id="totalSemRetorno">0</strong>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>OI</th>
+                  <th>Empresa</th>
+                  <th>Contato</th>
+                  <th>Telefone</th>
+                  <th>Template</th>
+                  <th>Protocolo</th>
+                  <th>Status envio</th>
+                  <th>Status follow-up</th>
+                  <th>Data envio</th>
+                  <th>Data resposta</th>
+                  <th>Prazo</th>
+                  <th>Analista</th>
+                </tr>
+              </thead>
+
+              <tbody id="relatorioBody">
+                <tr>
+                  <td colspan="12" class="empty-row">Nenhum registro encontrado.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="feedback-grid">
+            <div>
+              <div id="retornoRelatorio">Aguardando consulta...</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script  type="module" src="./javascript/relatorio.js"></script>
+</body>
+
+</html>

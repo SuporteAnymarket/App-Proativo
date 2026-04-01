@@ -1,0 +1,145 @@
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --border: #e5eaf2;
+  --text: #1f2937;
+  --muted: #6b7280;
+
+  --primary: #1f6fff;
+  --primary-soft: #e8f0ff;
+
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+main {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 28px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+form {
+  display: grid;
+  gap: 16px;
+}
+
+img {
+  width: 190px;
+  display: block;
+  margin: 0 auto 28px;
+  object-fit: contain;
+}
+
+h1 {
+  font-size: 28px;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+p {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  padding: 0 14px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+input::placeholder {
+  color: #9ca3af;
+}
+
+input:focus {
+  border-color: var(--primary);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+button {
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button[type="submit"] {
+  background: var(--primary);
+  color: white;
+}
+
+button[type="submit"]:hover {
+  opacity: 0.95;
+}
+
+button[type="reset"] {
+  background: #f3f4f6;
+  color: var(--text);
+}
+
+button[type="reset"]:hover {
+  background: #e5e7eb;
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 28px 22px;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  img {
+    width: 170px;
+  }
+}

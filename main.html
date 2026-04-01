@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANY-Message | Principal</title>
+  <link rel="stylesheet" href="./style/stylemain.css" />
+</head>
+
+<body>
+  <div class="layout">
+
+    <header class="top-menu">
+      <img class="logo" src="./LOGO_ANY_ANT_HORIZONTAL_1.svg" alt="Logo ANYMARKET" />
+
+      <nav class="menu">
+        <button class="active" data-target="acoes" type="button">Ações</button>
+        <button data-target="contatos" type="button">Base de contatos</button>
+        <button data-target="templates" type="button">Templates</button>
+        <button data-target="relatorios" type="button">Relatórios</button>
+      </nav>
+    </header>
+
+    <main class="content">
+
+      <header class="topbar">
+        <div>
+          <h1>Painel principal</h1>
+        </div>
+      </header>
+
+      <section id="acoes" class="page-section active">
+        <div class="card action-area">
+
+          <div class="section-head">
+            <h2>Ações</h2>
+            <p>Preencha os dados manualmente ou via integração.</p>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <select id="templateGlobal">
+              <option value="">Selecionar template para todos</option>
+            </select>
+
+            <button id="btnAplicarTemplate">Aplicar em todas as linhas</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>OI</th>
+                  <th>Empresa</th>
+                  <th>Nome</th>
+                  <th>Telefone</th>
+                  <th>Template</th>
+                  <th>Mensagem</th>
+                  <th>Email</th>
+                  <th>Título</th>
+                  <th>Descrição</th>
+                  <th>Motivo</th>
+                  <th>Time</th>
+                  <th>Analista</th>
+                  <th></th>
+                </tr>
+              </thead>
+
+              <tbody id="gridBody">
+                <tr>
+                  <td>
+                    <div class="autocomplete">
+                      <input type="text" data-field="oi" placeholder="OI" />
+                      <div class="autocomplete-list"></div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="autocomplete">
+                      <input type="text" data-field="empresa" placeholder="Empresa" />
+                      <div class="autocomplete-list"></div>
+                    </div>
+                  </td>
+
+                  <td><input type="text" data-field="nome" /></td>
+                  <td><input type="text" data-field="telefone" /></td>
+
+                  <td>
+                    <select data-field="template">
+                      <option value="">Selecione</option>
+                    </select>
+                  </td>
+
+                  <td>
+                    <textarea data-field="mensagemWhatsapp"></textarea>
+                  </td>
+
+                  <td><input type="email" data-field="email" /></td>
+                  <td><input type="text" data-field="tituloTicket" /></td>
+
+                  <td>
+                    <textarea data-field="descricaoTicket"></textarea>
+                  </td>
+
+                  <td><input type="text" data-field="motivo" /></td>
+                  <td><input type="text" data-field="time" /></td>
+
+                  <td>
+                    <input type="text" data-field="analista" readonly />
+                  </td>
+
+                  <td>
+                    <button class="btn-remove-row" type="button">Remover</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="actions-row">
+            <button id="btnAdicionarLinha">Adicionar linha</button>
+            <button id="btnCriarTicket">Criar ticket</button>
+            <button id="btnEnviarMensagem">Enviar mensagem</button>
+            <button id="btnLimparCampos">Limpar</button>
+            <input type="file" id="csvInput" />
+          </div>
+
+          <div class="feedback-grid">
+            <div>
+              <div id="retornoMensagem">Aguardando...</div>
+            </div>
+
+            <div>
+              <div id="retornoTicket">Aguardando...</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="./javascript/main.js"></script>
+</body>
+
+</html>
