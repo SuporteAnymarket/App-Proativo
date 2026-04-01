@@ -4,8 +4,8 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 
 
-const BACKEND_MENSAGEM_URL = "http://localhost:5000";
-const BACKEND_TICKET_URL = "http://localhost:5001";
+const BACKEND_MENSAGEM_URL = "http://195.200.0.29:6969";
+const BACKEND_TICKET_URL = "http://195.200.0.29:6970";
 
 const supabaseClient = supabase.createClient(
   SUPABASE_URL,
