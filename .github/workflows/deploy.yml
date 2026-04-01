@@ -31,7 +31,9 @@ jobs:
          . venv/bin/activate && \
          pip install -r requirements.txt && \
          npm install && \
+         chmod +x node_modules/.bin/vite && \
          npm run build && \
-         pm2 delete all || true && \
-         pm2 start ecosystem.config.js"
+         pm2 delete VITE-APP PYTHON-APP || true && \
+         pm2 start ecosystem.config.js && \
+         pm2 save"
  
