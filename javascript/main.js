@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 
 const BACKEND_MENSAGEM_URL = "http://195.200.0.29:6969";
-const BACKEND_TICKET_URL = "http://127.0.0.1:5001";
+const BACKEND_TICKET_URL = "http://195.200.0.29:6970";
 
 const supabaseClient = supabase.createClient(
   SUPABASE_URL,
@@ -598,7 +598,8 @@ async function enviarMensagemBackend(row, messageSendingId) {
     empresa: $('[data-field="empresa"]', row)?.value?.trim() || "",
     nome: $('[data-field="nome"]', row)?.value?.trim() || "",
     telefone: $('[data-field="telefone"]', row)?.value?.trim() || "",
-    mensagem: $('[data-field="mensagemWhatsapp"]', row)?.value?.trim() || ""
+    mensagem: $('[data-field="mensagemWhatsapp"]', row)?.value?.trim() || "",
+    analista: $('[data-field="analista"]', row)?.value?.trim() || ""
   };
 
   const response = await fetch(`${BACKEND_MENSAGEM_URL}/api/enviar-mensagem`, {

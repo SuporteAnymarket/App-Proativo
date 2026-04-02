@@ -17,6 +17,15 @@ module.exports = {
       env: {
         PORT: 6969
       }
+    },
+    {
+      name: "TICKET-APP",
+      script: "./venv/bin/python",
+      args: "backend/services/processarticket.py",
+      interpreter: "none",
+      env: {
+        PORT: 6970
+      }
     }
   ]
 };

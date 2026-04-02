@@ -91,7 +91,7 @@ def normalizar_telefone(telefone: str) -> str:
     return "".join(filter(str.isdigit, telefone))
 
 
-def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefone: str = "") -> str:
+def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefone: str = "", analista: str = "") -> str:
     texto = valor_texto(texto)
     nome = valor_texto(nome)
     empresa = valor_texto(empresa)
@@ -105,8 +105,6 @@ def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefon
     texto = texto.replace("[Telefone]", telefone)
     texto = texto.replace("[TELEFONE]", telefone)
     texto = texto.replace("[Analista]", analista)
-
-
 
     return texto
 
@@ -416,6 +414,7 @@ def api_criar_ticket():
             nome=nome,
             empresa=empresa,
             telefone=telefone,
+            analista=analista,
         )
 
         descricao_final = tratar_texto_template(
@@ -423,6 +422,7 @@ def api_criar_ticket():
             nome=nome,
             empresa=empresa,
             telefone=telefone,
+            analista=analista,
         )
 
         group_id = obter_group_id(time_nome) if time_nome else None
@@ -509,4 +509,4 @@ def health_ticket():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=6970, debug=True)
