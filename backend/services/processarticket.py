@@ -314,7 +314,7 @@ def criar_ticket(
         url,
         headers=ZENDESK_HEADERS,
         json=payload,
-        timeout=30,
+        timeout=100,
     )
     response.raise_for_status()
 
@@ -522,4 +522,4 @@ def health_ticket():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=6970, debug=True)
