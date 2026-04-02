@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Templates</title>
   <link rel="stylesheet" href="./style/template.css" />
 </head>
+
 <body>
   <div class="layout">
     <header class="top-menu">
@@ -65,7 +67,8 @@
 
           <div class="field field-full">
             <label for="mensagem">Mensagem</label>
-            <textarea id="mensagem" name="mensagem" placeholder="Digite a mensagem do template" class="textarea-lg" required></textarea>
+            <textarea id="mensagem" name="mensagem" placeholder="Digite a mensagem do template" class="textarea-lg"
+              required></textarea>
           </div>
 
           <div class="actions-row">
@@ -85,25 +88,8 @@
           <p>Visualize, edite e exclua os templates cadastrados.</p>
         </div>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Motivo</th>
-                <th>Título Ticket</th>
-                <th>Descrição</th>
-                <th>Mensagem</th>
-                <th>Time</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="templatesTableBody">
-              <tr>
-                <td colspan="7" class="empty-row">Carregando templates...</td>
-              </tr>
-            </tbody>
-          </table>
+        <div id="templatesList" class="templates-accordion">
+          <div class="empty-state">Carregando templates...</div>
         </div>
       </section>
     </main>
@@ -112,4 +98,5 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="./javascript/template.js"></script>
 </body>
+
 </html>
