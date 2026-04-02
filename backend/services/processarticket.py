@@ -30,7 +30,7 @@ ASSIGNEE_MAP = {
 }
 
 CUSTOM_FIELDS_MAP = {
-    "SKU não vinculado": [
+    "sku não vinculado": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},
@@ -39,14 +39,14 @@ CUSTOM_FIELDS_MAP = {
         {"id": 49289235923347, "value": "pedidos_nao_importado_p_anymarket"},
         {"id": 49290242736019, "value": "nao_importado_anymarket_sku_não_vinculado"},
     ],
-    "falta de atributo obrigatório": [
+    "atributos obrigatórios não informados": [
         {"id": 48845391931923, "value": "motivo_de_contato_anuncios"},
         {"id": 48845378518419, "value": "X"},
         {"id": 49289010167059, "value": "motivo_transmissoes"},
         {"id": 49491298231443, "value": "transmissoes_erro_ao_criar_transmissao"},
         {"id": 49491763175059, "value": "erro_criar_transmissao_falta_de_atributo_obrigatório"},
     ],
-    "MultiWarehouse": [
+    "multiwarehouse": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},
@@ -55,7 +55,16 @@ CUSTOM_FIELDS_MAP = {
         {"id": 49495118032147, "value": "duvidas_estoque"},
         {"id": 49492932151315, "value": "cadastrar/configurar_multicd"},
     ],
-    "Webnar": [
+    "webnar": [
+        {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
+        {"id": 48845411121427, "value": "X"},
+        {"id": 48845378518419, "value": "X"},
+        {"id": 48845412947731, "value": "X"},
+        {"id": 49289010167059, "value": "duvidas"},
+        {"id": 49495118032147, "value": "duvidas_estoque"},
+        {"id": 49492932151315, "value": "cadastrar/configurar_multicd"},
+    ],
+    "testetemplate": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},

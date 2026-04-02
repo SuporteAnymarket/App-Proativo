@@ -11,7 +11,7 @@ const form = document.getElementById("templateForm");
 const btnLimparCampos = document.getElementById("btnLimparCampos");
 const btnSalvarTemplate = document.getElementById("btnSalvarTemplate");
 const retornoMensagem = document.getElementById("retornoMensagem");
-const templatesTableBody = document.getElementById("templatesTableBody");
+const templatesList = document.getElementById("templatesList");
 
 const inputTemplateId = document.getElementById("templateId");
 const inputNome = document.getElementById("nome");
@@ -77,63 +77,41 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;");
 }
 
-async function carregarTemplates() {
-  if (!templatesTableBody) return;
+function bindAccordionEvents() {
+  const headers = document.querySelectorAll(".template-header");
 
-  templatesTableBody.innerHTML = `
-    <tr>
-      <td colspan="7" class="empty-row">Carregando templates...</td>
-    </tr>
-  `;
+  headers.forEach((header) => {
+    if (header.dataset.bound === "true") return;
 
-  const { data, error } = await supabaseClient
-    .from(TABLE_NAME)
-    .select("id, nome, motivo, titulo_ticket, descricao, mensagem, time")
-    .order("nome", { ascending: true });
+    header.addEventListener("click", () => {
+      const item = header.closest(".template-item");
+      const icon = item.querySelector(".template-toggle-icon");
+      const isOpen = item.classList.contains("open");
 
-  if (error) {
-    templatesTableBody.innerHTML = `
-      <tr>
-        <td colspan="7" class="empty-row">Erro ao carregar templates.</td>
-      </tr>
-    `;
-    console.error("Erro ao buscar templates:", error);
-    return;
-  }
+      document.querySelectorAll(".template-item.open").forEach((openedItem) => {
+        openedItem.classList.remove("open");
+        const openedIcon = openedItem.querySelector(".template-toggle-icon");
+        if (openedIcon) openedIcon.textContent = "+";
+      });
 
-  if (!data || data.length === 0) {
-    templatesTableBody.innerHTML = `
-      <tr>
-        <td colspan="7" class="empty-row">Nenhum template cadastrado.</td>
-      </tr>
-    `;
-    return;
-  }
+      if (!isOpen) {
+        item.classList.add("open");
+        if (icon) icon.textContent = "−";
+      }
+    });
 
-  templatesTableBody.innerHTML = data
-    .map((item) => {
-      return `
-        <tr>
-          <td>${escapeHtml(item.nome)}</td>
-          <td class="cell-wrap">${escapeHtml(item.motivo)}</td>
-          <td class="cell-wrap">${escapeHtml(item.titulo_ticket)}</td>
-          <td class="cell-wrap">${escapeHtml(item.descricao)}</td>
-          <td class="cell-wrap">${escapeHtml(item.mensagem)}</td>
-          <td>${escapeHtml(item.time)}</td>
-          <td>
-            <div class="action-buttons">
-              <button type="button" class="btn-editar" data-id="${item.id}">Editar</button>
-              <button type="button" class="btn-excluir" data-id="${item.id}">Excluir</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    })
-    .join("");
+    header.dataset.bound = "true";
+  });
+}
 
+function bindTemplateActionButtons() {
   const botoesEditar = document.querySelectorAll(".btn-editar");
   botoesEditar.forEach((botao) => {
-    botao.addEventListener("click", async () => {
+    if (botao.dataset.bound === "true") return;
+
+    botao.addEventListener("click", async (event) => {
+      event.stopPropagation();
+
       const id = botao.dataset.id;
 
       const { data, error } = await supabaseClient
@@ -150,13 +128,18 @@ async function carregarTemplates() {
 
       preencherFormularioParaEdicao(data);
     });
+
+    botao.dataset.bound = "true";
   });
 
   const botoesExcluir = document.querySelectorAll(".btn-excluir");
   botoesExcluir.forEach((botao) => {
-    botao.addEventListener("click", async () => {
-      const id = botao.dataset.id;
+    if (botao.dataset.bound === "true") return;
 
+    botao.addEventListener("click", async (event) => {
+      event.stopPropagation();
+
+      const id = botao.dataset.id;
       const confirmar = confirm("Deseja realmente excluir este template?");
       if (!confirmar) return;
 
@@ -178,7 +161,90 @@ async function carregarTemplates() {
       setFeedback("Template excluído com sucesso.", "success");
       await carregarTemplates();
     });
+
+    botao.dataset.bound = "true";
   });
+}
+
+async function carregarTemplates() {
+  if (!templatesList) return;
+
+  templatesList.innerHTML = `<div class="empty-state">Carregando templates...</div>`;
+
+  const { data, error } = await supabaseClient
+    .from(TABLE_NAME)
+    .select("id, nome, motivo, titulo_ticket, descricao, mensagem, time")
+    .order("nome", { ascending: true });
+
+  if (error) {
+    templatesList.innerHTML = `<div class="empty-state">Erro ao carregar templates.</div>`;
+    console.error("Erro ao buscar templates:", error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    templatesList.innerHTML = `<div class="empty-state">Nenhum template cadastrado.</div>`;
+    return;
+  }
+
+  templatesList.innerHTML = data
+    .map((item) => {
+      const nome = escapeHtml(item.nome || "Sem nome");
+      const motivo = escapeHtml(item.motivo || "-");
+      const titulo = escapeHtml(item.titulo_ticket || "-");
+      const descricao = escapeHtml(item.descricao || "-");
+      const mensagem = escapeHtml(item.mensagem || "-");
+      const time = escapeHtml(item.time || "-");
+
+      return `
+        <div class="template-item">
+          <button type="button" class="template-header" data-id="${item.id}">
+            <div class="template-header-main">
+              <strong>${nome}</strong>
+              <span class="template-badge">${motivo}</span>
+            </div>
+
+            <div class="template-header-side">
+              <span class="template-time">${time}</span>
+              <span class="template-toggle-icon">+</span>
+            </div>
+          </button>
+
+          <div class="template-content" id="template-content-${item.id}">
+            <div class="template-content-grid">
+              <div class="template-block">
+                <span class="template-label">Título do ticket</span>
+                <p>${titulo}</p>
+              </div>
+
+              <div class="template-block">
+                <span class="template-label">Descrição</span>
+                <p>${descricao}</p>
+              </div>
+
+              <div class="template-block">
+                <span class="template-label">Mensagem</span>
+                <p>${mensagem}</p>
+              </div>
+
+              <div class="template-block">
+                <span class="template-label">Time</span>
+                <p>${time}</p>
+              </div>
+            </div>
+
+            <div class="template-actions">
+              <button type="button" class="btn-editar" data-id="${item.id}">Editar</button>
+              <button type="button" class="btn-excluir" data-id="${item.id}">Excluir</button>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  bindAccordionEvents();
+  bindTemplateActionButtons();
 }
 
 async function salvarTemplate(event) {
@@ -267,7 +333,6 @@ function setupMenu() {
       }
     });
   });
-
 }
 
 document.addEventListener("DOMContentLoaded", () => {
