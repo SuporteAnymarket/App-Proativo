@@ -61,7 +61,7 @@ def formatar_telefone_api(telefone: str) -> str:
     return f"+55{telefone}"
 
 
-def tratar_mensagem(mensagem: str, nome: str = "", empresa: str = "", telefone: str = "") -> str:
+def tratar_mensagem(mensagem: str, nome: str = "", empresa: str = "", telefone: str = "", analista: str = "") -> str:
     mensagem = valor_texto(mensagem)
     nome = valor_texto(nome)
     empresa = valor_texto(empresa)
