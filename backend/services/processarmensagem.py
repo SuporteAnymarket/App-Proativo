@@ -1,10 +1,12 @@
-import requests
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from supabase import create_client, Client
-from datetime import datetime, timezone
-from dotenv import load_dotenv
 import os
+import unicodedata
+from datetime import datetime, timezone
+
+import requests
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from supabase import Client, create_client
 
 load_dotenv()
 
@@ -15,7 +17,10 @@ URL_CRIAR_CHAT = "https://api.smclick.com.br/attendances/chats"
 URL_ENVIAR_MENSAGEM = "https://api.smclick.com.br/instances/messages"
 URL_BUSCAR_MENSAGENS = "https://api.smclick.com.br/attendances/chats/message"
 
-INSTANCE_ID = os.getenv("INSTANCE_ID")
+
+INSTANCE_ID_PADRAO = os.getenv("INSTANCE_ID")
+INSTANCE_ID_WELISON = os.getenv("INSTANCE_ID_WELISON") or INSTANCE_ID_PADRAO
+INSTANCE_ID_ELIEZER = os.getenv("INSTANCE_ID_ELIEZER")
 DEPARTMENT_ID = os.getenv("DEPARTMENT_ID")
 
 SUPABASE_URL = "https://elhwbybeovmkbzgoahwb.supabase.co"
@@ -23,15 +28,13 @@ SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
 HEADERS = {
     "x-api-key": API_KEY,
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
 }
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 app = Flask(__name__)
 CORS(app)
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 
 def valor_texto(valor) -> str:
@@ -63,6 +66,7 @@ def tratar_mensagem(mensagem: str, nome: str = "", empresa: str = "", telefone: 
     nome = valor_texto(nome)
     empresa = valor_texto(empresa)
     telefone = normalizar_telefone(telefone)
+    analista = valor_texto(analista)
 
     mensagem = mensagem.replace("[NOME]", nome)
     mensagem = mensagem.replace("[Nome]", nome)
@@ -70,11 +74,104 @@ def tratar_mensagem(mensagem: str, nome: str = "", empresa: str = "", telefone: 
     mensagem = mensagem.replace("[Empresa]", empresa)
     mensagem = mensagem.replace("[Telefone]", telefone)
     mensagem = mensagem.replace("[TELEFONE]", telefone)
+    mensagem = mensagem.replace("[Analista]", analista)
+    mensagem = mensagem.replace("[analista]", analista)
+
 
     return mensagem
 
 
-def buscar_chat_por_telefone(telefone: str):
+def normalizar_nome_analista(analista: str) -> str:
+    texto = valor_texto(analista).lower()
+    if not texto:
+        return ""
+
+    texto = unicodedata.normalize("NFD", texto)
+    texto = "".join(ch for ch in texto if unicodedata.category(ch) != "Mn")
+    return " ".join(texto.split())
+
+
+def obter_instance_id_por_analista(analista: str) -> str:
+    analista_normalizado = normalizar_nome_analista(analista)
+
+    mapa_instancias = {
+        "welison": INSTANCE_ID_WELISON,
+        "eliezer": INSTANCE_ID_ELIEZER,
+    }
+
+    if analista_normalizado in mapa_instancias:
+        instance_id = mapa_instancias[analista_normalizado]
+        if not instance_id:
+            raise ValueError(f"INSTANCE_ID não configurado para o analista: {analista}")
+        return instance_id
+
+    # Mantém compatibilidade caso o front ainda não envie o analista.
+    if INSTANCE_ID_PADRAO:
+        return INSTANCE_ID_PADRAO
+
+    if INSTANCE_ID_WELISON:
+        return INSTANCE_ID_WELISON
+
+    raise ValueError(
+        "Nenhuma instância válida foi encontrada. Configure INSTANCE_ID ou "
+        "INSTANCE_ID_WELISON/INSTANCE_ID_ELIEZER no arquivo .env."
+    )
+
+
+def extrair_instance_do_chat(chat: dict) -> str | None:
+    if not isinstance(chat, dict):
+        return None
+
+    candidatos_diretos = [
+        chat.get("instance"),
+        chat.get("instance_id"),
+        chat.get("instanceId"),
+    ]
+
+    for valor in candidatos_diretos:
+        if valor:
+            return str(valor).strip()
+
+    for chave in ["data", "result", "item", "chat", "attendance", "instance_data"]:
+        nested = chat.get(chave)
+        if isinstance(nested, dict):
+            for subchave in ["instance", "instance_id", "instanceId", "id"]:
+                valor = nested.get(subchave)
+                if valor:
+                    return str(valor).strip()
+
+    return None
+
+
+def selecionar_chat_por_instance(chats: list[dict], instance_id: str | None = None):
+    if not chats:
+        return None
+
+    if not instance_id:
+        return chats[0]
+
+    for chat in chats:
+        instance_chat = extrair_instance_do_chat(chat)
+        if instance_chat and str(instance_chat).strip() == str(instance_id).strip():
+            return chat
+
+    return chats[0]
+
+
+def extrair_lista_do_retorno(data):
+    if isinstance(data, list):
+        return data
+
+    if isinstance(data, dict):
+        for key in ["results", "data", "items"]:
+            valor = data.get(key)
+            if isinstance(valor, list):
+                return valor
+
+    return []
+
+
+def buscar_chat_por_telefone(telefone: str, instance_id: str | None = None):
     telefone_api = formatar_telefone_api(telefone)
 
     response = requests.get(
@@ -86,22 +183,18 @@ def buscar_chat_por_telefone(telefone: str):
     response.raise_for_status()
 
     data = response.json()
+    chats = extrair_lista_do_retorno(data)
 
-    if isinstance(data, list):
-        return data[0] if data else None
+    if chats:
+        return selecionar_chat_por_instance(chats, instance_id)
 
-    if isinstance(data, dict):
-        for key in ["results", "data", "items"]:
-            if key in data and data[key]:
-                return data[key][0]
-
-        if "id" in data:
-            return data
+    if isinstance(data, dict) and "id" in data:
+        return data
 
     return None
 
 
-def criar_chat(telefone: str, empresa: str, nome: str):
+def criar_chat(telefone: str, empresa: str, nome: str, instance_id: str):
     telefone_api = formatar_telefone_api(telefone)
 
     empresa = valor_texto(empresa)
@@ -117,7 +210,7 @@ def criar_chat(telefone: str, empresa: str, nome: str):
         nome_contato = telefone_api
 
     payload = {
-        "instance": INSTANCE_ID,
+        "instance": instance_id,
         "department": DEPARTMENT_ID,
         "type": "contact",
         "contact": {
@@ -151,11 +244,11 @@ def criar_chat(telefone: str, empresa: str, nome: str):
     return True
 
 
-def enviar_mensagem_smclick(telefone: str, mensagem: str):
+def enviar_mensagem_smclick(telefone: str, mensagem: str, instance_id: str):
     telefone_api = formatar_telefone_api(telefone)
 
     payload = {
-        "instance": INSTANCE_ID,
+        "instance": instance_id,
         "type": "text",
         "content": {
             "telephone": telefone_api,
@@ -456,14 +549,14 @@ def avaliar_followup_registro(registro: dict):
         return {
             "id": registro_id,
             "status_followup": "IGNORADO",
-            "motivo": "Registro sem data_envio."
+            "motivo": "Registro sem data_envio.",
         }
 
     if not protocolo:
         return {
             "id": registro_id,
             "status_followup": "IGNORADO",
-            "motivo": "Não foi possível localizar protocolo pelo banco nem pelo telefone."
+            "motivo": "Não foi possível localizar protocolo pelo banco nem pelo telefone.",
         }
 
     mensagens = buscar_mensagens_por_protocolo(protocolo)
@@ -534,6 +627,7 @@ def api_enviar_mensagem():
         nome = valor_texto(body.get("nome"))
         telefone = valor_texto(body.get("telefone"))
         mensagem_original = valor_texto(body.get("mensagem"))
+        analista = valor_texto(body.get("analista"))
 
         if not message_id:
             return jsonify({"ok": False, "erro": "message_sending_id é obrigatório."}), 400
@@ -554,20 +648,27 @@ def api_enviar_mensagem():
             )
             return jsonify({"ok": False, "erro": "Mensagem é obrigatória."}), 400
 
+        instance_id = obter_instance_id_por_analista(analista)
+
         telefone_normalizado = normalizar_telefone(telefone)
         mensagem_final = tratar_mensagem(
             mensagem=mensagem_original,
             nome=nome,
             empresa=empresa,
             telefone=telefone_normalizado,
+            analista=analista,
         )
 
-        chat = buscar_chat_por_telefone(telefone_normalizado)
+        chat = buscar_chat_por_telefone(telefone_normalizado, instance_id=instance_id)
         if not chat:
-            criar_chat(telefone_normalizado, empresa, nome)
-            chat = buscar_chat_por_telefone(telefone_normalizado)
+            criar_chat(telefone_normalizado, empresa, nome, instance_id=instance_id)
+            chat = buscar_chat_por_telefone(telefone_normalizado, instance_id=instance_id)
 
-        retorno = enviar_mensagem_smclick(telefone_normalizado, mensagem_final)
+        retorno = enviar_mensagem_smclick(
+            telefone_normalizado,
+            mensagem_final,
+            instance_id=instance_id,
+        )
         protocolo = extrair_protocolo(chat=chat, retorno=retorno)
 
         atualizar_message_sending(
@@ -587,6 +688,8 @@ def api_enviar_mensagem():
                 "telefone": formatar_telefone_api(telefone_normalizado),
                 "mensagem_final": mensagem_final,
                 "protocolo": protocolo,
+                "instance_id_usada": instance_id,
+                "analista": analista,
                 "retorno": retorno,
             }
         )
@@ -666,11 +769,13 @@ def api_atualizar_followup():
 
             except Exception as e:
                 total_erros += 1
-                resultados.append({
-                    "id": registro.get("id"),
-                    "status_followup": "ERRO",
-                    "erro": str(e),
-                })
+                resultados.append(
+                    {
+                        "id": registro.get("id"),
+                        "status_followup": "ERRO",
+                        "erro": str(e),
+                    }
+                )
 
         return jsonify(
             {
