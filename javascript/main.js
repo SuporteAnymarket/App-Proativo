@@ -598,7 +598,8 @@ async function enviarMensagemBackend(row, messageSendingId) {
     empresa: $('[data-field="empresa"]', row)?.value?.trim() || "",
     nome: $('[data-field="nome"]', row)?.value?.trim() || "",
     telefone: $('[data-field="telefone"]', row)?.value?.trim() || "",
-    mensagem: $('[data-field="mensagemWhatsapp"]', row)?.value?.trim() || ""
+    mensagem: $('[data-field="mensagemWhatsapp"]', row)?.value?.trim() || "",
+    analista: $('[data-field="analista"]', row)?.value?.trim() || ""
   };
 
   const response = await fetch(`${BACKEND_MENSAGEM_URL}/api/enviar-mensagem`, {
