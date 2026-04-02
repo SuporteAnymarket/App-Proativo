@@ -27,6 +27,7 @@ GROUP_ID_ATIVO = 48846951707539
 ASSIGNEE_MAP = {
     "welison": 48642609483155,
     "eliézer": 48642518395923,
+    "eliezer": 48642518395923,
 }
 
 CUSTOM_FIELDS_MAP = {
@@ -64,6 +65,15 @@ CUSTOM_FIELDS_MAP = {
         {"id": 49495118032147, "value": "duvidas_estoque"},
         {"id": 49492932151315, "value": "cadastrar/configurar_multicd"},
     ],
+    "Testetemplate": [
+        {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
+        {"id": 48845411121427, "value": "X"},
+        {"id": 48845378518419, "value": "X"},
+        {"id": 48845412947731, "value": "X"},
+        {"id": 49289010167059, "value": "duvidas"},
+        {"id": 49495118032147, "value": "duvidas_estoque"},
+        {"id": 49492932151315, "value": "cadastrar/configurar_multicd"},
+    ],
 }
 
 app = Flask(__name__)
@@ -91,7 +101,7 @@ def normalizar_telefone(telefone: str) -> str:
     return "".join(filter(str.isdigit, telefone))
 
 
-def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefone: str = "") -> str:
+def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefone: str = "", analista: str = "") -> str:
     texto = valor_texto(texto)
     nome = valor_texto(nome)
     empresa = valor_texto(empresa)
@@ -105,6 +115,7 @@ def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefon
     texto = texto.replace("[Telefone]", telefone)
     texto = texto.replace("[TELEFONE]", telefone)
     texto = texto.replace("[Analista]", analista)
+    texto = texto.replace("[analista]", analista)
 
 
 
@@ -416,6 +427,7 @@ def api_criar_ticket():
             nome=nome,
             empresa=empresa,
             telefone=telefone,
+            analista=analista,
         )
 
         descricao_final = tratar_texto_template(
@@ -423,6 +435,7 @@ def api_criar_ticket():
             nome=nome,
             empresa=empresa,
             telefone=telefone,
+            analista=analista,
         )
 
         group_id = obter_group_id(time_nome) if time_nome else None

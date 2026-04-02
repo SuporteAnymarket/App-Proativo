@@ -94,18 +94,16 @@ def normalizar_nome_analista(analista: str) -> str:
 def obter_instance_id_por_analista(analista: str) -> str:
     analista_normalizado = normalizar_nome_analista(analista)
 
-    mapa_instancias = {
-        "welison": INSTANCE_ID_WELISON,
-        "eliezer": INSTANCE_ID_ELIEZER,
-    }
-
-    if analista_normalizado in mapa_instancias:
-        instance_id = mapa_instancias[analista_normalizado]
-        if not instance_id:
+    if "welison" in analista_normalizado:
+        if not INSTANCE_ID_WELISON:
             raise ValueError(f"INSTANCE_ID não configurado para o analista: {analista}")
-        return instance_id
+        return INSTANCE_ID_WELISON
 
-    # Mantém compatibilidade caso o front ainda não envie o analista.
+    if "eliezer" in analista_normalizado:
+        if not INSTANCE_ID_ELIEZER:
+            raise ValueError(f"INSTANCE_ID não configurado para o analista: {analista}")
+        return INSTANCE_ID_ELIEZER
+
     if INSTANCE_ID_PADRAO:
         return INSTANCE_ID_PADRAO
 
