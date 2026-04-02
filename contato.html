@@ -20,6 +20,63 @@
     </header>
 
     <main class="content">
+       <section class="card">
+        <div class="section-head">
+          <div>
+            <h2>Buscar empresas cadastradas</h2>
+            <p>Pesquise por nome da empresa ou OI para localizar um cadastro específico.</p>
+          </div>
+        </div>
+
+        <div class="busca-empresas-box">
+          <div class="busca-empresas-grid">
+            <div class="field">
+              <label for="filtroTipoBusca">Buscar por</label>
+              <select id="filtroTipoBusca">
+                <option value="name">Empresa</option>
+                <option value="oi">OI</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="inputBuscaEmpresa">Pesquisar</label>
+              <input
+                type="text"
+                id="inputBuscaEmpresa"
+                placeholder="Digite o nome da empresa ou o OI"
+              />
+            </div>
+
+            <div class="actions-row busca-empresas-actions">
+              <button type="button" id="btnBuscarEmpresa" class="btn-primary">Buscar</button>
+              <button type="button" id="btnLimparBuscaEmpresa" class="btn-light">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback-grid">
+          <div id="retornoBuscaEmpresa">Faça uma busca para visualizar empresas cadastradas.</div>
+        </div>
+
+        <div class="table-wrap hidden" id="resultadoBuscaWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>OI</th>
+                <th>Status</th>
+                <th>Qtd. contatos</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="empresasTableBody">
+              <tr>
+                <td colspan="5" class="empty-row">Faça uma busca para visualizar os resultados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
       <section class="card card-cadastro">
         <div class="section-head">
           <div>
@@ -122,7 +179,7 @@
           </div>
 
           <div class="actions-row form-actions">
-            <button type="button" id="btnNovaEmpresa" class="btn-light">Nova empresa</button>
+            <button type="button" id="btnNovaEmpresa" class="btn-light">Limpar campos</button>
             <button type="submit" id="btnSalvarEmpresa" class="btn-primary">Salvar empresa e contatos</button>
           </div>
         </form>
@@ -152,64 +209,6 @@
 
         <div class="feedback-grid">
           <div id="retornoCsv">Nenhum arquivo importado.</div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="section-head">
-          <div>
-            <h2>Buscar empresas cadastradas</h2>
-            <p>Pesquise por nome da empresa ou OI para localizar um cadastro específico.</p>
-          </div>
-        </div>
-
-        <div class="busca-empresas-box">
-          <div class="busca-empresas-grid">
-            <div class="field">
-              <label for="filtroTipoBusca">Buscar por</label>
-              <select id="filtroTipoBusca">
-                <option value="name">Empresa</option>
-                <option value="oi">OI</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="inputBuscaEmpresa">Pesquisar</label>
-              <input
-                type="text"
-                id="inputBuscaEmpresa"
-                placeholder="Digite o nome da empresa ou o OI"
-              />
-            </div>
-
-            <div class="actions-row busca-empresas-actions">
-              <button type="button" id="btnBuscarEmpresa" class="btn-primary">Buscar</button>
-              <button type="button" id="btnLimparBuscaEmpresa" class="btn-light">Limpar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="feedback-grid">
-          <div id="retornoBuscaEmpresa">Faça uma busca para visualizar empresas cadastradas.</div>
-        </div>
-
-        <div class="table-wrap hidden" id="resultadoBuscaWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>OI</th>
-                <th>Status</th>
-                <th>Qtd. contatos</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="empresasTableBody">
-              <tr>
-                <td colspan="5" class="empty-row">Faça uma busca para visualizar os resultados.</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </section>
     </main>
