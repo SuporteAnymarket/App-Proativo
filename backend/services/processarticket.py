@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 import os
 import requests
+import unicodedata
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from supabase import Client, create_client
@@ -21,17 +22,13 @@ ZENDESK_HEADERS = {
 SUPABASE_URL = "https://elhwbybeovmkbzgoahwb.supabase.co"
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
-
 GROUP_ID_ATIVO = 48846951707539
 
-ASSIGNEE_MAP = {
-    "welison": 48642609483155,
-    "eliézer": 48642518395923,
-    "eliezer": 48642518395923,
-}
+ASSIGNEE_WELISON = 48642609483155
+ASSIGNEE_ELIEZER = 48642518395923
 
 CUSTOM_FIELDS_MAP = {
-    "SKU não vinculado": [
+    "sku não vinculado": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},
@@ -47,7 +44,7 @@ CUSTOM_FIELDS_MAP = {
         {"id": 49491298231443, "value": "transmissoes_erro_ao_criar_transmissao"},
         {"id": 49491763175059, "value": "erro_criar_transmissao_falta_de_atributo_obrigatório"},
     ],
-    "MultiWarehouse": [
+    "multiwarehouse": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},
@@ -56,7 +53,7 @@ CUSTOM_FIELDS_MAP = {
         {"id": 49495118032147, "value": "duvidas_estoque"},
         {"id": 49492932151315, "value": "cadastrar/configurar_multicd"},
     ],
-    "Webnar": [
+    "webnar": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},
@@ -65,7 +62,7 @@ CUSTOM_FIELDS_MAP = {
         {"id": 49495118032147, "value": "duvidas_estoque"},
         {"id": 49492932151315, "value": "cadastrar/configurar_multicd"},
     ],
-    "Testetemplate": [
+    "testetemplate": [
         {"id": 48845391931923, "value": "motivo_de_contato_pedidos"},
         {"id": 48845411121427, "value": "X"},
         {"id": 48845378518419, "value": "X"},
@@ -92,6 +89,16 @@ def normalizar_texto(valor) -> str:
     return valor_texto(valor).strip().lower()
 
 
+def normalizar_nome_analista(valor) -> str:
+    texto = valor_texto(valor).lower()
+    if not texto:
+        return ""
+
+    texto = unicodedata.normalize("NFD", texto)
+    texto = "".join(ch for ch in texto if unicodedata.category(ch) != "Mn")
+    return " ".join(texto.split())
+
+
 def normalizar_telefone(telefone: str) -> str:
     telefone = valor_texto(telefone)
 
@@ -101,7 +108,13 @@ def normalizar_telefone(telefone: str) -> str:
     return "".join(filter(str.isdigit, telefone))
 
 
-def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefone: str = "", analista: str = "") -> str:
+def tratar_texto_template(
+    texto: str,
+    nome: str = "",
+    empresa: str = "",
+    telefone: str = "",
+    analista: str = ""
+) -> str:
     texto = valor_texto(texto)
     nome = valor_texto(nome)
     empresa = valor_texto(empresa)
@@ -116,8 +129,8 @@ def tratar_texto_template(texto: str, nome: str = "", empresa: str = "", telefon
     texto = texto.replace("[TELEFONE]", telefone)
     texto = texto.replace("[Analista]", analista)
     texto = texto.replace("[analista]", analista)
-
-
+    texto = texto.replace("[ANALISTA]", analista)
+    texto = texto.replace("[Analista}", analista)
 
     return texto
 
@@ -132,8 +145,15 @@ def obter_group_id(nome_grupo: str):
 
 
 def obter_assignee_id(nome_analista: str):
-    nome_analista = normalizar_texto(nome_analista)
-    return ASSIGNEE_MAP.get(nome_analista)
+    nome_analista = normalizar_nome_analista(nome_analista)
+
+    if "welison" in nome_analista:
+        return ASSIGNEE_WELISON
+
+    if "eliezer" in nome_analista:
+        return ASSIGNEE_ELIEZER
+
+    return None
 
 
 def obter_custom_fields(motivo: str):
@@ -371,6 +391,8 @@ def atualizar_message_sending(
 @app.post("/api/criar-ticket")
 def api_criar_ticket():
     try:
+        print("[ticket] 1. entrou na rota /api/criar-ticket", flush=True)
+
         body = request.get_json(force=True)
 
         message_id = valor_texto(body.get("message_sending_id"))
@@ -384,6 +406,12 @@ def api_criar_ticket():
         motivo = valor_texto(body.get("motivo"))
         time_nome = valor_texto(body.get("time"))
         analista = valor_texto(body.get("analista"))
+
+        print(
+            f"[ticket] payload recebido: message_id={message_id}, client_id={client_id}, "
+            f"empresa={empresa}, nome={nome}, email_front={email_front}, analista={analista}",
+            flush=True
+        )
 
         if not message_id:
             return jsonify({"ok": False, "erro": "message_sending_id é obrigatório."}), 400
@@ -413,6 +441,10 @@ def api_criar_ticket():
             return jsonify({"ok": False, "erro": "Descrição do ticket é obrigatória."}), 400
 
         email_principal, emails_cc, _ = resolver_email_principal_e_ccs(client_id, email_front)
+        print(
+            f"[ticket] 2. resolveu email principal e ccs: email_principal={email_principal}, emails_cc={emails_cc}",
+            flush=True
+        )
 
         if not email_principal:
             atualizar_message_sending(
@@ -443,8 +475,19 @@ def api_criar_ticket():
         custom_fields = obter_custom_fields(motivo)
         email_ccs_payload = montar_email_ccs(emails_cc)
 
+        print(
+            f"[ticket] 3. group_id={group_id}, assignee_id={assignee_id}, "
+            f"custom_fields_qtd={len(custom_fields)}, email_ccs_qtd={len(email_ccs_payload)}",
+            flush=True
+        )
+
         usuario, status_usuario = garantir_usuario(nome, email_principal)
         requester_id = usuario.get("id")
+
+        print(
+            f"[ticket] 4. requester_id={requester_id}, status_usuario={status_usuario}",
+            flush=True
+        )
 
         retorno_ticket = criar_ticket(
             requester_id=requester_id,
@@ -457,6 +500,8 @@ def api_criar_ticket():
             custom_fields=custom_fields,
             email_ccs=email_ccs_payload,
         )
+
+        print("[ticket] 5. ticket retornado pelo Zendesk", flush=True)
 
         ticket = retorno_ticket.get("ticket", {})
         ticket_id = ticket.get("id", "")
@@ -487,6 +532,8 @@ def api_criar_ticket():
         except Exception:
             detalhe = str(e)
 
+        print(f"[ticket] HTTPError: {detalhe or str(e)}", flush=True)
+
         message_id = valor_texto(request.json.get("message_sending_id")) if request.is_json else ""
         if message_id:
             atualizar_message_sending(
@@ -502,6 +549,8 @@ def api_criar_ticket():
         }), 500
 
     except Exception as e:
+        print(f"[ticket] Exception: {str(e)}", flush=True)
+
         message_id = valor_texto(request.json.get("message_sending_id")) if request.is_json else ""
         if message_id:
             atualizar_message_sending(
